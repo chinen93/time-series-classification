@@ -1,5 +1,4 @@
 import torch
-import torch.optim as optim
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
@@ -10,11 +9,11 @@ def train(dataloader_train: DataLoader,
           dataloader_test: DataLoader,
           device: str,
           model: nn.Module,
+          optimizer,
           epochs: int,
-          learning_rate: float,
           save: bool):
 
-    optimiser = optim.Adam(model.parameters(),lr=learning_rate)
+    optimiser = optimizer
     history = []
 
     bar_format = (
