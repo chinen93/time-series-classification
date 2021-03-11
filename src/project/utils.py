@@ -49,25 +49,41 @@ def data_dictionary(datasets):
     return dataset_dict
 
 
-def print_dataset_info(dataset,dataloader):
+def print_dataset_info(dataset, dataloader):
     """
 
     Print information about the dataset
 
     """
     train = dataloader['train']
-    test  = dataloader['test']
-    time_steps = train.dataset.x.shape[-1]
-    n_classes  = len(np.unique(train.dataset.y))
+    test = dataloader['test']
+    time_steps = train.dataset.inputs.shape[-1]
+    n_classes = len(np.unique(train.dataset.targets))
 
     print(dataset)
-    print('train samples={}\ttest samples={}\ttime steps={}\tnum. classes={}'
-      .format(len(train.dataset.x),
-              len(test.dataset.x),
-              time_steps,n_classes))
+    print('train samples={}\ttest samples={}\ttime steps={}\tnum. classes={}'.format(
+        len(train.dataset.inputs),
+        len(test.dataset.inputs),
+        time_steps, n_classes)
+    )
 
 
-def mpce(model,test_dataloader,device):
+def print_history(history):
+    """
+    Print only the essential history information
+    """
+    best_loss = 99999
+    for acc, loss, error_rate in history:
+        if loss <= best_loss:
+            best_loss = loss
+            print('ACC: {:5.2f} Loss: {:5.3f} Error Rate: {:5.3f}'.format(
+                acc,
+                loss,
+                error_rate
+            ))
+
+
+def mpce(model, test_dataloader, device):
     """
 
     Mean per-class error as described in the paper:
