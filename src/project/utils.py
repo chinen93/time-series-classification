@@ -39,8 +39,8 @@ def data_dictionary(datasets):
     pbar = tqdm(datasets)
     for dataset in pbar:
         pbar.set_description('Processing {}'.format(dataset))
-        train_set, test_set = Data(dataset,False),Data(dataset,True)
-        batch_size = min(16,len(train_set)//10)
+        train_set, test_set = Data(dataset, False), Data(dataset, True)
+        batch_size = min(16, len(train_set)//10)
 
         dataset_dict[dataset] = {}
         dataset_dict[dataset]['train'] = DataLoader(train_set, batch_size=batch_size)
@@ -77,30 +77,30 @@ def mpce(model,test_dataloader,device):
         mean.
 
     """
-    x = np.array(test_dataloader.dataset.x)
-    y = np.array(test_dataloader.dataset.y)
+    inputs = np.array(test_dataloader.dataset.inputs)
+    targets = np.array(test_dataloader.dataset.targets)
 
-    counts = {label: count for label,count in
-              enumerate(np.bincount(y))}
-    label_idxs = {label: np.where(y==label)[0]
+    counts = {label: count for label, count in
+              enumerate(np.bincount(targets))}
+    label_idxs = {label: np.where(targets == label)[0]
                   for label in counts.keys()}
 
-    x = torch.Tensor(x).to(device)
-    y = torch.Tensor(y).long().to(device)
+    inputs = torch.Tensor(inputs).to(device)
+    targets = torch.Tensor(targets).long().to(device)
 
     errors = {}
     model.eval()
-    for label,idxs in label_idxs.items():
-        batch_size = min(16,len(idxs)//10+1)
-        batches = np.arange(0,len(idxs),batch_size)
+    for label, idxs in label_idxs.items():
+        batch_size = min(16, len(idxs)//10+1)
+        batches = np.arange(0, len(idxs), batch_size)
 
         errors[label] = 0
-        for b,_ in enumerate(batches[:-1]):
-            out = model(x[batches[b]:batches[b+1]])
-            loss = F.cross_entropy(out,y[batches[b]:batches[b+1]])
+        for b, _ in enumerate(batches[:-1]):
+            out = model(inputs[batches[b]:batches[b+1]])
+            loss = F.cross_entropy(out, targets[batches[b]:batches[b+1]])
             errors[label] += loss.item()*out.size(0)
 
         errors[label] = errors[label]/len(idxs)
 
-    mean_per_class_error = np.mean([v for _,v in errors.items()])
+    mean_per_class_error = np.mean([v for _, v in errors.items()])
     return mean_per_class_error
