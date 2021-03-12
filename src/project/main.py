@@ -1,6 +1,8 @@
 import numpy as np
 from time import sleep
 
+import neptune
+
 # import our modules
 import torch
 import torch.optim as optim
@@ -11,7 +13,25 @@ from ConvNet import *
 from ResNet import *
 
 def main():
+    # Parameters:
+    epochs = 5000
     seed_number = 42
+
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    print('Using device: {}\n'.format(device))
+
+
+    # Create Neptune client.
+    neptune.init(project_qualified_name='pedro-chinen/time-series-classification')
+    neptune.create_experiment(
+        upload_source_files=[],
+        params={
+            "epochs": epochs,
+            "seed": seed_number,
+            "device": device
+        }
+    )
+
     torch.manual_seed(seed_number)
     np.random.seed(seed_number)
 
@@ -19,16 +39,10 @@ def main():
     # download_datasets(datasets)  # uncomment this to download the data
     dataset_dictionary = data_dictionary(datasets)
 
-    # training loop
-    epochs = 5000
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    print('Using device: {}\n'.format(device))
-
     for dataset, dataloader in dataset_dictionary.items():
 
         # setting up
         print_dataset_info(dataset, dataloader)
-        print()
         sleep(1)
 
         time_steps = dataloader['test'].dataset.inputs.shape[-1]

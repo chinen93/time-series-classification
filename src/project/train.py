@@ -2,16 +2,25 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
+
 from tqdm import tqdm, trange
+
 from utils import *
 
-def train(dataloader_train: DataLoader,
+import neptune
+
+
+def train(model_name: str,
+          dataset_name: str,
+          dataloader_train: DataLoader,
           dataloader_test: DataLoader,
           device: str,
           model: nn.Module,
           optimizer,
           epochs: int,
           save: bool):
+
+    desc = '{}_{}'.format(model_name, dataset_name)
 
     history = []
 
@@ -28,6 +37,7 @@ def train(dataloader_train: DataLoader,
         bar_format=bar_format,
         postfix=postfix
     )
+    best_loss = 999
 
     for epoch in range(epochs):
 
@@ -45,6 +55,7 @@ def train(dataloader_train: DataLoader,
             loss.backward()
             optimizer.step()
 
+            neptune.log_metric('{}_train_loss'.format(desc), loss.item())
 
         # test
         model.eval()
@@ -71,6 +82,14 @@ def train(dataloader_train: DataLoader,
         progress_bar.update(n=1)
 
         history.append((test_acc * 100, test_loss, test_error_rate))
+
+        neptune.log_metric('{}_test_accuracy'.format(desc), test_acc)
+        neptune.log_metric('{}_test_loss'.format(desc), test_loss)
+        neptune.log_metric('{}_test_error_rate'.format(desc), test_error_rate)
+        if test_loss <= best_loss:
+            best_loss = test_loss
+            neptune.log_metric('{}_test_best_loss'.format(desc), x=epoch, y=test_loss)
+            neptune.log_metric('{}_test_best_error_rate'.format(desc), x=epoch, y=test_error_rate)
 
         if save:
             #save
