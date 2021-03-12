@@ -54,16 +54,16 @@ def main():
         if torch.cuda.device_count() > 0:
             model = nn.DataParallel(model)
         model.to(device)
-        model, history = train(dataloader_train=dataloader['train'],
+        model, history = train(model_name="MLP",
+                               dataset_name=dataset,
+                               dataloader_train=dataloader['train'],
                                dataloader_test=dataloader['test'],
                                device=device,
                                model=model,
                                optimizer=optimizer,
                                epochs=epochs,
                                save=False)
-        print('MPCE: {0:.4f}'.format(mpce(model, dataloader['test'], device)))
-        print_history(history)
-
+        # print('MPCE: {0:.4f}'.format(mpce(model, dataloader['test'], device)))
         sleep(1)
 
         # # ConvNet
@@ -73,25 +73,33 @@ def main():
         #     model = nn.DataParallel(model)
         # model.to(device)
 
-        # model, history = train(dataloader['train'],
-        #                        dataloader['test'],
-        #                        device, model,
-        #                        epochs, learning_rate,
+        # optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999), eps=1e-08)
+        # model, history = train(dataloader_train=dataloader['train'],
+        #                        dataloader_test=dataloader['test'],
+        #                        device=device,
+        #                        model=model,
+        #                        optimizer=optimizer,
+        #                        epochs=epochs,
         #                        save=False)
         # print('MPCE: {0:.4f}'.format(mpce(model, dataloader['test'], device)))
+        # print_history(history)
         # sleep(1)
 
-        # ResNet
+        # # ResNet
         # model = ResNet(time_steps,n_classes)
         # if torch.cuda.device_count() > 0:
         #     model = nn.DataParallel(model)
         # model.to(device)
-        # model, history = train(dataloader['train'],
-        #                        dataloader['test'],
-        #                        device, model,
-        #                        epochs, learning_rate,
+        # optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999), eps=1e-08)
+        # model, history = train(dataloader_train=dataloader['train'],
+        #                        dataloader_test=dataloader['test'],
+        #                        device=device,
+        #                        model=model,
+        #                        optimizer=optimizer,
+        #                        epochs=epochs,
         #                        save=False)
         # print('MPCE: {0:.4f}'.format(mpce(model,dataloader['test'],device)))
+        # print_history(history)
 
         print()
 
