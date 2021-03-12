@@ -39,7 +39,7 @@ def data_dictionary(datasets):
     pbar = tqdm(datasets)
     for dataset in pbar:
         pbar.set_description('Processing {}'.format(dataset))
-        train_set, test_set = Data(dataset, False), Data(dataset, True)
+        train_set, test_set = Data(dataset, testing=False), Data(dataset, testing=True)
         batch_size = min(16, len(train_set)//10)
 
         dataset_dict[dataset] = {}
@@ -64,8 +64,8 @@ def print_dataset_info(dataset, dataloader):
     print('train samples={}\ttest samples={}\ttime steps={}\tnum. classes={}'.format(
         len(train.dataset.inputs),
         len(test.dataset.inputs),
-        time_steps, n_classes)
-    )
+        time_steps, n_classes
+    ))
 
 
 def print_history(history):
