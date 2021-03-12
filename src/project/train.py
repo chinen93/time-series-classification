@@ -47,6 +47,7 @@ def train(dataloader_train: DataLoader,
 
 
         # test
+        model.eval()
         running_loss = 0
         running_acc = 0
         for batch, data in enumerate(dataloader_test):
