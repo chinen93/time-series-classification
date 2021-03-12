@@ -73,10 +73,11 @@ def print_history(history):
     Print only the essential history information
     """
     best_loss = 99999
-    for acc, loss, error_rate in history:
+    for epoch, (acc, loss, error_rate) in enumerate(history):
         if loss <= best_loss:
             best_loss = loss
-            print('ACC: {:5.2f} Loss: {:5.3f} Error Rate: {:5.3f}'.format(
+            print('{:5} ACC: {:5.2f} Loss: {:8.6f} Error Rate: {:5.3f}'.format(
+                epoch,
                 acc,
                 loss,
                 error_rate
