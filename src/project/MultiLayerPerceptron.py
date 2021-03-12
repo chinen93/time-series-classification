@@ -28,4 +28,4 @@ class MultiLayerPerceptron(nn.Module):
 
         x = x.view(-1, self.n_classes)
 
-        return F.log_softmax(x, 1)
+        return x

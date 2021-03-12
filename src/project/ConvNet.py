@@ -33,4 +33,4 @@ class ConvNet(nn.Module):
         x = x.view(-1, 128)
         x = self.fc4(x)
 
-        return F.log_softmax(x, 1)
+        return x
