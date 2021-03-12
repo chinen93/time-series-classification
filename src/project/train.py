@@ -13,7 +13,6 @@ def train(dataloader_train: DataLoader,
           epochs: int,
           save: bool):
 
-    optimiser = optimizer
     history = []
 
     bar_format = (
@@ -38,13 +37,14 @@ def train(dataloader_train: DataLoader,
             inputs, targets = data
             inputs, targets = inputs.to(device), (targets.view(-1)).to(device)
 
-            optimiser.zero_grad()
+            optimizer.zero_grad()
 
             out = model(inputs)
             loss = F.cross_entropy(out, targets)
 
             loss.backward()
-            optimiser.step()
+            optimizer.step()
+
 
         # test
         running_loss = 0
