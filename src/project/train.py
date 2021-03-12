@@ -69,13 +69,14 @@ def train(model_name: str,
             sum_right = ((torch.argmax(outs, 1)) == targets).cpu().detach().numpy().sum()
             test_acc = sum_right/len(targets)
             test_loss = F.cross_entropy(outs, targets).item()
-            running_acc += test_acc * inputs.size(0)
-            running_loss += test_loss * inputs.size(0)
+            running_acc += test_acc
+            running_loss += test_loss
 
-        test_size = len(dataloader_test.dataset)
+        test_size = len(dataloader_test)
         test_acc = running_acc / test_size
         test_loss = running_loss / test_size
         test_error_rate = 1 - test_acc
+
         progress_bar.postfix[0] = test_acc * 100
         progress_bar.postfix[1] = test_loss
         progress_bar.postfix[2] = test_error_rate
