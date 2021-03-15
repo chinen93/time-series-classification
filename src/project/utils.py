@@ -39,7 +39,7 @@ def data_dictionary(datasets):
     pbar = tqdm(datasets)
     for dataset in pbar:
         pbar.set_description('Processing {}'.format(dataset))
-        train_set, test_set = Data(dataset, testing=False), Data(dataset, testing=True)
+        train_set, test_set = DataTSV(dataset, testing=False), DataTSV(dataset, testing=True)
         batch_size = min(16, len(train_set)//10)
 
         dataset_dict[dataset] = {}
