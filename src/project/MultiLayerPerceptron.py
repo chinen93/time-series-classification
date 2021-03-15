@@ -9,22 +9,32 @@ class MultiLayerPerceptron(nn.Module):
         self.n_in = n_in
         self.n_classes = n_classes
 
+        self.dropout1 = nn.Dropout(0.1)
         self.fc1 = nn.Linear(n_in, 500)
+
+        self.dropout2 = nn.Dropout(0.2)
         self.fc2 = nn.Linear(500, 500)
-        self.fc3 = nn.Linear(500, self.n_classes)
+
+        self.dropout3 = nn.Dropout(0.2)
+        self.fc3 = nn.Linear(500, 500)
+
+        self.dropout4 = nn.Dropout(0.3)
+        self.fc4 = nn.Linear(500, self.n_classes)
 
 
     def forward(self, x: torch.Tensor):
-        x = F.dropout(x, p=0.1)
 
+        x = self.dropout1(x)
         x = F.relu(self.fc1(x))
-        x = F.dropout(x, p=0.2)
 
+        x = self.dropout2(x)
         x = F.relu(self.fc2(x))
-        x = F.dropout(x, p=0.2)
 
+        x = self.dropout3(x)
         x = F.relu(self.fc3(x))
-        x = F.dropout(x, p=0.3)
+
+        x = self.dropout4(x)
+        x = self.fc4(x)
 
         x = x.view(-1, self.n_classes)
 
