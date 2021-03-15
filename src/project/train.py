@@ -20,6 +20,10 @@ def train(model_name: str,
           epochs: int,
           save: bool):
 
+
+    criterion = nn.CrossEntropyLoss()
+    criterion.to(device)
+
     desc = '{}_{}'.format(model_name, dataset_name)
 
     history = []
@@ -41,7 +45,10 @@ def train(model_name: str,
 
     for epoch in range(epochs):
 
-        # train
+        # ================================
+        # Train
+        # ================================
+        # training mode enables dropout
         model.train()
         for batch, data in enumerate(dataloader_train):
             inputs, targets = data
@@ -50,25 +57,30 @@ def train(model_name: str,
             optimizer.zero_grad()
 
             out = model(inputs)
-            loss = F.cross_entropy(out, targets)
+            loss = criterion(out, targets)
 
             loss.backward()
             optimizer.step()
 
             neptune.log_metric('{}_train_loss'.format(desc), loss.item())
 
-        # test
+        # ================================
+        # Test
+        # ================================
         model.eval()
         running_loss = 0
         running_acc = 0
         for batch, data in enumerate(dataloader_test):
             inputs, targets = data
             inputs, targets = inputs.to(device), (targets.view(-1)).to(device)
-            outs = model(inputs)
 
-            sum_right = ((torch.argmax(outs, 1)) == targets).cpu().detach().numpy().sum()
-            test_acc = sum_right/len(targets)
-            test_loss = F.cross_entropy(outs, targets).item()
+            with torch.no_grad():
+                outs = model(inputs)
+
+                sum_right = ((torch.argmax(outs, 1)) == targets).cpu().detach().numpy().sum()
+                test_acc = sum_right/len(targets)
+                test_loss = criterion(outs, targets).item()
+
             running_acc += test_acc
             running_loss += test_loss
 
