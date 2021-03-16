@@ -110,6 +110,9 @@ def main():
         print()
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass
 else:
     raise "This script should be called as a single program"
