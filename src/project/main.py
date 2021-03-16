@@ -23,7 +23,7 @@ def main():
     torch.manual_seed(seed_number)
     np.random.seed(seed_number)
 
-    datasets = np.loadtxt('datasets_small.txt', dtype=str)
+    datasets = np.loadtxt('datasets.txt', dtype=str)
     # download_datasets(datasets)  # uncomment this to download the data
     dataset_dictionary = data_dictionary(datasets)
 
