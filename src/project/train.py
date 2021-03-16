@@ -20,13 +20,13 @@ def train(model_name: str,
           epochs: int,
           save: bool):
 
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer,
-        factor=0.5,
-        patience=50,
-        min_lr=0.0001,
-        verbose=True
-    )
+    # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+    #     optimizer,
+    #     factor=0.5,
+    #     patience=50,
+    #     min_lr=0.0001,
+    #     verbose=True
+    # )
 
     criterion = nn.CrossEntropyLoss()
     criterion.to(device)
@@ -91,7 +91,7 @@ def train(model_name: str,
             running_acc += test_acc
             running_loss += test_loss
 
-        scheduler.step(test_loss)
+        # scheduler.step(test_loss)
 
         test_size = len(dataloader_test)
         test_acc = running_acc / test_size
