@@ -35,7 +35,10 @@ def main():
             "epochs": epochs,
             "seed": seed_number,
             "device": device
-        }
+        },
+        tags=[
+            "FCN"
+        ]
     )
 
     for dataset, dataloader in dataset_dictionary.items():
