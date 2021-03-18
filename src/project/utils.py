@@ -36,10 +36,13 @@ def data_dictionary(datasets):
 
     """
     dataset_dict = {}
-    pbar = tqdm(datasets)
-    for dataset in pbar:
-        pbar.set_description('Processing {}'.format(dataset))
-        train_set, test_set = DataTSV(dataset, testing=False), DataTSV(dataset, testing=True)
+    for dataset in list(datasets):
+        try:
+            train_set, test_set = DataTSV(dataset, testing=False), DataTSV(dataset, testing=True)
+        except ValueError:
+            print("{} has invalid values or std = 0".format(dataset))
+            continue
+
         batch_size = min(16, len(train_set)//10)
 
         dataset_dict[dataset] = {}

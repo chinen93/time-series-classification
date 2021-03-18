@@ -65,12 +65,18 @@ class DataTSV(Dataset):
         dtypes.update({train_data.columns[-1]: np.int})
         train_data = train_data.astype(dtypes)
 
+        if not np.isfinite(train_data).all().all():
+            raise ValueError
+
         self.inputs = train_data.iloc[:, 1:].values
         self.targets = train_data.iloc[:, 0].values
 
 
         self.mean = np.mean(self.inputs, axis=0)
         self.std = np.std(self.inputs, axis=0)
+
+        if (self.std == 0).any():
+            raise ValueError
 
         if testing:
             test_data = pd.read_csv(
@@ -81,6 +87,9 @@ class DataTSV(Dataset):
             dtypes = {i:np.float32 for i in test_data.columns[:-1]}
             dtypes.update({test_data.columns[-1]: np.int})
             test_data = test_data.astype(dtypes)
+
+            if not np.isfinite(test_data).all().all():
+                raise ValueError
 
             self.inputs = test_data.iloc[:, 1:].values
             self.targets = test_data.iloc[:, 0].values
