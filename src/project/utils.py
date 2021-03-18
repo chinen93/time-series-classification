@@ -36,7 +36,9 @@ def data_dictionary(datasets):
 
     """
     dataset_dict = {}
-    for dataset in list(datasets):
+    pbar = tqdm(datasets)
+    for dataset in pbar:
+        pbar.set_description('Processing {}'.format(dataset))
         try:
             train_set, test_set = DataTSV(dataset, testing=False), DataTSV(dataset, testing=True)
         except ValueError:
