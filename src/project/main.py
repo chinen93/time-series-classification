@@ -132,13 +132,22 @@ def main():
     # download_datasets(datasets)  # uncomment this to download the data
     dataset_dictionary = data_dictionary(datasets)
 
-    torch.manual_seed(parameters["seed_number"])
-    np.random.seed(parameters["seed_number"])
+    for number in range(5):
+        parameters["seed_number"] += number
+        seed = parameters["seed_number"]
 
-    run_experiments(
-        datasets=dataset_dictionary,
-        parameters=parameters
-    )
+        torch.manual_seed()
+        np.random.seed(seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed(seed)
+            torch.cuda.manual_seed_all(seed)
+            torch.backends.cudnn.deterministic = True
+            torch.backends.cudnn.benchmark = False
+
+        run_experiments(
+            datasets=dataset_dictionary,
+            parameters=parameters
+        )
 
 if __name__ == "__main__":
     try:
