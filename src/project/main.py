@@ -13,15 +13,24 @@ from ConvNet import *
 from ResNet import *
 
 def main():
-    # Parameters:
-    epochs = 1000
-    seed_number = 42
-
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     print('Using device: {}\n'.format(device))
 
-    torch.manual_seed(seed_number)
-    np.random.seed(seed_number)
+    # Parameters:
+    parameters = {
+        "epochs": 1000,
+        "seed_number": 42,
+        "device": device,
+        "mlp_lr": 0.1,
+        "mlp_rho": 0.95,
+        "mlp_eps": 1e-8,
+        "fcn_lr": 0.001,
+        "fcn_betas": (0.9, 0.999),
+        "fcn_eps": 1e-8
+    }
+
+    torch.manual_seed(parameters["seed_number"])
+    np.random.seed(parameters["seed_number"])
 
     datasets = np.loadtxt('datasets.txt', dtype=str)
     # download_datasets(datasets)  # uncomment this to download the data
@@ -31,15 +40,14 @@ def main():
     neptune.init(project_qualified_name='pedro-chinen/time-series-classification')
     neptune.create_experiment(
         upload_source_files=[],
-        params={
-            "epochs": epochs,
-            "seed": seed_number,
-            "device": device
-        },
+        params=parameters,
         tags=[
             "FCN"
         ]
     )
+    neptune.log_artifact("ConvNet.py")
+    neptune.log_artifact("MultiLayerPerceptron.py")
+    neptune.log_artifact("ResNet.py")
 
     for dataset, dataloader in dataset_dictionary.items():
 
@@ -52,7 +60,12 @@ def main():
 
         # MLP
         # model = MultiLayerPerceptron(time_steps, n_classes)
-        # optimizer = optim.Adadelta(model.parameters(), lr=0.1, rho=0.95, eps=1e-8)
+        # optimizer = optim.Adadelta(
+        #     model.parameters(),
+        #     lr=parameters["mlp_lr"],
+        #     rho=parameters["mlp_rho"],
+        #     eps=parameters["mlp_eps"]
+        # )
         # if torch.cuda.device_count() > 0:
         #     model = nn.DataParallel(model)
         # model.to(device)
@@ -63,10 +76,8 @@ def main():
         #                        device=device,
         #                        model=model,
         #                        optimizer=optimizer,
-        #                        epochs=epochs,
+        #                        epochs=parameters["epochs"],
         #                        save=False)
-        # print('MPCE: {0:.4f}'.format(mpce(model, dataloader['test'], device)))
-        # sleep(1)
 
         # ConvNet
         model = ConvNet(time_steps, n_classes)
@@ -75,7 +86,12 @@ def main():
             model = nn.DataParallel(model)
         model.to(device)
 
-        optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999), eps=1e-08)
+        optimizer = optim.Adam(
+            model.parameters(),
+            lr=parameters["fcn_lr"],
+            betas=parameters["fcn_betas"],
+            eps=parameters["fcn_eps"]
+        )
         model, history = train(model_name="FCN",
                                dataset_name=dataset,
                                dataloader_train=dataloader['train'],
@@ -83,18 +99,20 @@ def main():
                                device=device,
                                model=model,
                                optimizer=optimizer,
-                               epochs=epochs,
+                               epochs=parameters["epochs"],
                                save=False)
-        # print('MPCE: {0:.4f}'.format(mpce(model, dataloader['test'], device)))
-        # print_history(history)
-        # sleep(1)
 
         # ResNet
-        # model = ResNet(time_steps,n_classes)
+        # model = ResNet(time_steps, n_classes)
         # if torch.cuda.device_count() > 0:
         #     model = nn.DataParallel(model)
         # model.to(device)
-        # optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999), eps=1e-08)
+        # optimizer = optim.Adam(
+        #     model.parameters(),
+        #     lr=parameters["fcn_lr"],
+        #     betas=parameters["fcn_betas"],
+        #     eps=parameters["fcn_eps"]
+        # )
         # model, history = train(model_name="ResNet",
         #                        dataset_name=dataset,
         #                        dataloader_train=dataloader['train'],
@@ -102,12 +120,9 @@ def main():
         #                        device=device,
         #                        model=model,
         #                        optimizer=optimizer,
-        #                        epochs=epochs,
+        #                        epochs=parameters["epochs"],
         #                        save=False)
-        # print('MPCE: {0:.4f}'.format(mpce(model,dataloader['test'],device)))
-        # print_history(history)
-
-        print()
+        # print()
 
 if __name__ == "__main__":
     try:
