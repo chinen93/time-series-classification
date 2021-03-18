@@ -12,33 +12,8 @@ from MultiLayerPerceptron import *
 from ConvNet import *
 from ResNet import *
 
-def main():
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    print('Using device: {}\n'.format(device))
 
-    # Parameters:
-    parameters = {
-        "epochs": 1000,
-        "seed_number": 42,
-        "device": device,
-        "run_mlp": False,
-        "run_fcn": True,
-        "run_resnet": False,
-        "mlp_lr": 0.1,
-        "mlp_rho": 0.95,
-        "mlp_eps": 1e-8,
-        "fcn_lr": 0.001,
-        "fcn_betas": (0.9, 0.999),
-        "fcn_eps": 1e-8
-    }
-
-    torch.manual_seed(parameters["seed_number"])
-    np.random.seed(parameters["seed_number"])
-
-    datasets = np.loadtxt('datasets.txt', dtype=str)
-    # download_datasets(datasets)  # uncomment this to download the data
-    dataset_dictionary = data_dictionary(datasets)
-
+def run_experiments(datasets, parameters):
     # Create Neptune client.
     neptune.init(project_qualified_name='pedro-chinen/time-series-classification')
     neptune.create_experiment(
@@ -52,7 +27,9 @@ def main():
     neptune.log_artifact("MultiLayerPerceptron.py")
     neptune.log_artifact("ResNet.py")
 
-    for dataset, dataloader in dataset_dictionary.items():
+    device = parameters["device"]
+
+    for dataset, dataloader in datasets.items():
 
         # setting up
         print_dataset_info(dataset, dataloader)
@@ -130,6 +107,38 @@ def main():
                                    optimizer=optimizer,
                                    epochs=parameters["epochs"],
                                    save=False)
+
+def main():
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    print('Using device: {}\n'.format(device))
+
+    # Parameters:
+    parameters = {
+        "epochs": 1000,
+        "seed_number": 42,
+        "device": device,
+        "run_mlp": False,
+        "run_fcn": True,
+        "run_resnet": False,
+        "mlp_lr": 0.1,
+        "mlp_rho": 0.95,
+        "mlp_eps": 1e-8,
+        "fcn_lr": 0.001,
+        "fcn_betas": (0.9, 0.999),
+        "fcn_eps": 1e-8
+    }
+
+    datasets = np.loadtxt('datasets_small.txt', dtype=str)
+    # download_datasets(datasets)  # uncomment this to download the data
+    dataset_dictionary = data_dictionary(datasets)
+
+    torch.manual_seed(parameters["seed_number"])
+    np.random.seed(parameters["seed_number"])
+
+    run_experiments(
+        datasets=dataset_dictionary,
+        parameters=parameters
+    )
 
 if __name__ == "__main__":
     try:
