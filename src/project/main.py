@@ -21,6 +21,9 @@ def main():
         "epochs": 1000,
         "seed_number": 42,
         "device": device,
+        "run_mlp": False,
+        "run_fcn": True,
+        "run_resnet": False,
         "mlp_lr": 0.1,
         "mlp_rho": 0.95,
         "mlp_eps": 1e-8,
@@ -59,70 +62,74 @@ def main():
         n_classes = len(np.unique(dataloader['test'].dataset.targets))
 
         # MLP
-        # model = MultiLayerPerceptron(time_steps, n_classes)
-        # optimizer = optim.Adadelta(
-        #     model.parameters(),
-        #     lr=parameters["mlp_lr"],
-        #     rho=parameters["mlp_rho"],
-        #     eps=parameters["mlp_eps"]
-        # )
-        # if torch.cuda.device_count() > 0:
-        #     model = nn.DataParallel(model)
-        # model.to(device)
-        # model, history = train(model_name="MLP",
-        #                        dataset_name=dataset,
-        #                        dataloader_train=dataloader['train'],
-        #                        dataloader_test=dataloader['test'],
-        #                        device=device,
-        #                        model=model,
-        #                        optimizer=optimizer,
-        #                        epochs=parameters["epochs"],
-        #                        save=False)
+        if parameters["run_mlp"]:
+            print("MLP")
+            model = MultiLayerPerceptron(time_steps, n_classes)
+            optimizer = optim.Adadelta(
+                model.parameters(),
+                lr=parameters["mlp_lr"],
+                rho=parameters["mlp_rho"],
+                eps=parameters["mlp_eps"]
+            )
+            if torch.cuda.device_count() > 0:
+                model = nn.DataParallel(model)
+            model.to(device)
+            model, history = train(model_name="MLP",
+                                   dataset_name=dataset,
+                                   dataloader_train=dataloader['train'],
+                                   dataloader_test=dataloader['test'],
+                                   device=device,
+                                   model=model,
+                                   optimizer=optimizer,
+                                   epochs=parameters["epochs"],
+                                   save=False)
 
         # ConvNet
-        model = ConvNet(time_steps, n_classes)
-        print(time_steps, n_classes)
-        if torch.cuda.device_count() > 0:
-            model = nn.DataParallel(model)
-        model.to(device)
+        if parameters["run_fcn"]:
+            print("FCN")
+            model = ConvNet(time_steps, n_classes)
+            if torch.cuda.device_count() > 0:
+                model = nn.DataParallel(model)
+            model.to(device)
 
-        optimizer = optim.Adam(
-            model.parameters(),
-            lr=parameters["fcn_lr"],
-            betas=parameters["fcn_betas"],
-            eps=parameters["fcn_eps"]
-        )
-        model, history = train(model_name="FCN",
-                               dataset_name=dataset,
-                               dataloader_train=dataloader['train'],
-                               dataloader_test=dataloader['test'],
-                               device=device,
-                               model=model,
-                               optimizer=optimizer,
-                               epochs=parameters["epochs"],
-                               save=False)
+            optimizer = optim.Adam(
+                model.parameters(),
+                lr=parameters["fcn_lr"],
+                betas=parameters["fcn_betas"],
+                eps=parameters["fcn_eps"]
+            )
+            model, history = train(model_name="FCN",
+                                   dataset_name=dataset,
+                                   dataloader_train=dataloader['train'],
+                                   dataloader_test=dataloader['test'],
+                                   device=device,
+                                   model=model,
+                                   optimizer=optimizer,
+                                   epochs=parameters["epochs"],
+                                   save=False)
 
         # ResNet
-        # model = ResNet(time_steps, n_classes)
-        # if torch.cuda.device_count() > 0:
-        #     model = nn.DataParallel(model)
-        # model.to(device)
-        # optimizer = optim.Adam(
-        #     model.parameters(),
-        #     lr=parameters["fcn_lr"],
-        #     betas=parameters["fcn_betas"],
-        #     eps=parameters["fcn_eps"]
-        # )
-        # model, history = train(model_name="ResNet",
-        #                        dataset_name=dataset,
-        #                        dataloader_train=dataloader['train'],
-        #                        dataloader_test=dataloader['test'],
-        #                        device=device,
-        #                        model=model,
-        #                        optimizer=optimizer,
-        #                        epochs=parameters["epochs"],
-        #                        save=False)
-        # print()
+        if parameters["run_resnet"]:
+            print("ResNet")
+            model = ResNet(time_steps, n_classes)
+            if torch.cuda.device_count() > 0:
+                model = nn.DataParallel(model)
+            model.to(device)
+            optimizer = optim.Adam(
+                model.parameters(),
+                lr=parameters["fcn_lr"],
+                betas=parameters["fcn_betas"],
+                eps=parameters["fcn_eps"]
+            )
+            model, history = train(model_name="ResNet",
+                                   dataset_name=dataset,
+                                   dataloader_train=dataloader['train'],
+                                   dataloader_test=dataloader['test'],
+                                   device=device,
+                                   model=model,
+                                   optimizer=optimizer,
+                                   epochs=parameters["epochs"],
+                                   save=False)
 
 if __name__ == "__main__":
     try:
