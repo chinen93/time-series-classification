@@ -47,7 +47,6 @@ class ConvNet(nn.Module):
         self.avgpool = nn.AdaptiveAvgPool1d(output_size=1)
 
 
-
     def forward(self, x: torch.Tensor):
         x = x.view(-1, 1, self.n_in)
 

@@ -12,23 +12,8 @@ from MultiLayerPerceptron import *
 from ConvNet import *
 from ResNet import *
 
-
-def run_experiments(datasets, parameters):
-    # Create Neptune client.
-    neptune.init(project_qualified_name='pedro-chinen/time-series-classification')
-    neptune.create_experiment(
-        upload_source_files=[],
-        params=parameters,
-        tags=[
-            "FCN"
-        ]
-    )
-    neptune.log_artifact("ConvNet.py")
-    neptune.log_artifact("MultiLayerPerceptron.py")
-    neptune.log_artifact("ResNet.py")
-
+def run_train_models(datasets, parameters):
     device = parameters["device"]
-
     for dataset, dataloader in datasets.items():
 
         # setting up
@@ -108,6 +93,29 @@ def run_experiments(datasets, parameters):
                                    epochs=parameters["epochs"],
                                    save=False)
 
+
+def run_experiments(datasets, parameters):
+    # Create Neptune client.
+    neptune.init(project_qualified_name='pedro-chinen/time-series-classification')
+    neptune.create_experiment(
+        upload_source_files=[],
+        params=parameters,
+        tags=[
+            "Local",
+            "FCN"
+        ]
+    )
+    neptune.log_artifact("ConvNet.py")
+    neptune.log_artifact("MultiLayerPerceptron.py")
+    neptune.log_artifact("ResNet.py")
+
+    try:
+        run_train_models(datasets, parameters)
+    except KeyboardInterrupt:
+        pass
+
+    neptune.stop()
+
 def main():
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     print('Using device: {}\n'.format(device))
@@ -150,9 +158,6 @@ def main():
         )
 
 if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        pass
+    main()
 else:
     raise "This script should be called as a single program"
