@@ -72,23 +72,27 @@ class ResidualBlock(nn.Module):
         )
         self.bnI = nn.BatchNorm1d(self.out_maps)
 
-
     def forward(self, x):
-        identity = self.bnI(self.convI(x))
+
+        is_expand_channels = not self.in_maps == self.out_maps
+        if is_expand_channels:
+            identity = self.bnI(self.convI(x))
+        else:
+            identity = self.bnI(x)
 
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
 
+        # Clip timesteps to the smaller one.
         shape = identity.shape[2]
         id_shape = x.shape[2]
         if shape > id_shape:
             shape = id_shape
-
         x = x[:, :, :shape]
         identity = identity[:, :, :shape]
-        x += identity
 
-        x = F.relu(x)
+        # Add residual part.
+        x += identity
 
         return x
