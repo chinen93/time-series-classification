@@ -39,6 +39,8 @@ class ConvNet(nn.Module):
         )
         self.bn3 = nn.BatchNorm1d(num_features=128)
 
+        self.dropout = nn.Dropout(p=0.5)
+        self.relu = nn.ReLU(inplace=True)
         self.conv4 = nn.Conv1d(
             in_channels=128,
             out_channels=self.n_classes,
@@ -54,8 +56,11 @@ class ConvNet(nn.Module):
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
 
+        x = self.dropout(x)
         x = self.conv4(x)
+        x = self.relu(x)
         x = self.avgpool(x)
+
         x = x.view(x.shape[0], -1)
 
         return x
