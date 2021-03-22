@@ -95,14 +95,22 @@ def run_train_models(datasets, parameters):
 
 
 def run_experiments(datasets, parameters):
+
+    # Populate tags with some info.
+    tags = []
+    if parameters['run_mlp']:
+        tags.append("MLP")
+    if parameters['run_fcn']:
+        tags.append("FCN")
+    if parameters['run_resnet']:
+        tags.append("ResNet")
+
     # Create Neptune client.
     neptune.init(project_qualified_name='pedro-chinen/time-series-classification')
     neptune.create_experiment(
         upload_source_files=[],
         params=parameters,
-        tags=[
-            "FCN"
-        ]
+        tags=tags
     )
     neptune.log_artifact("ConvNet.py")
     neptune.log_artifact("MultiLayerPerceptron.py")
@@ -125,8 +133,8 @@ def main():
         "seed_number": 42,
         "device": device,
         "run_mlp": False,
-        "run_fcn": True,
-        "run_resnet": False,
+        "run_fcn": False,
+        "run_resnet": True,
         "mlp_lr": 0.1,
         "mlp_rho": 0.95,
         "mlp_eps": 1e-8,
