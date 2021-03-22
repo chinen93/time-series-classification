@@ -101,7 +101,6 @@ def run_experiments(datasets, parameters):
         upload_source_files=[],
         params=parameters,
         tags=[
-            "Local",
             "FCN"
         ]
     )
