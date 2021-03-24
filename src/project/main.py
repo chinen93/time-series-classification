@@ -129,7 +129,7 @@ def main():
 
     # Parameters:
     parameters = {
-        "epochs": 1000,
+        "epochs": 2000,
         "seed_number": 42,
         "device": device,
         "run_mlp": False,
