@@ -132,9 +132,9 @@ def main():
         "epochs": 2000,
         "seed_number": 42,
         "device": device,
-        "run_mlp": False,
+        "run_mlp": True,
         "run_fcn": True,
-        "run_resnet": False,
+        "run_resnet": True,
         "mlp_lr": 0.1,
         "mlp_rho": 0.95,
         "mlp_eps": 1e-8,
@@ -143,7 +143,7 @@ def main():
         "fcn_eps": 1e-8
     }
 
-    datasets = np.loadtxt('datasets_small.txt', dtype=str)
+    datasets = np.loadtxt('datasets.txt', dtype=str)
     # download_datasets(datasets)  # uncomment this to download the data
     dataset_dictionary = data_dictionary(datasets)
 
