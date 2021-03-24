@@ -8,6 +8,7 @@ from tqdm import tqdm, trange
 from utils import *
 
 import neptune
+import time
 
 
 def train(model_name: str,
@@ -56,6 +57,7 @@ def train(model_name: str,
         # Train
         # ================================
         # training mode enables dropout
+        start_time = time.time()
         model.train()
         for batch, data in enumerate(dataloader_train):
             inputs, targets = data
@@ -71,9 +73,13 @@ def train(model_name: str,
 
             neptune.log_metric('{}_train_loss'.format(desc), loss.item())
 
+        elapsed_time = time.time() - start_time
+        neptune.log_metric('{}_train_time'.format(desc), elapsed_time)
+
         # ================================
         # Test
         # ================================
+        start_time = time.time()
         model.eval()
         running_loss = 0
         running_acc = 0
@@ -108,6 +114,8 @@ def train(model_name: str,
         neptune.log_metric('{}_test_accuracy'.format(desc), test_acc)
         neptune.log_metric('{}_test_loss'.format(desc), test_loss)
         neptune.log_metric('{}_test_error_rate'.format(desc), test_error_rate)
+        elapsed_time = time.time() - start_time
+        neptune.log_metric('{}_test_time'.format(desc), elapsed_time)
         if test_loss <= best_loss:
             best_loss = test_loss
             neptune.log_metric('{}_test_best_loss'.format(desc), x=epoch, y=test_loss)
