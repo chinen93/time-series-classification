@@ -40,13 +40,6 @@ class ConvNet(nn.Module):
         self.bn3 = nn.BatchNorm1d(num_features=128)
 
         self.avgpool = nn.AdaptiveAvgPool1d(output_size=1)
-
-        self.conv4 = nn.Conv1d(
-            in_channels=128,
-            out_channels=self.n_classes,
-            kernel_size=1,
-            stride=1
-        )
         self.fully_connected = nn.Linear(128, self.n_classes)
 
 
@@ -56,12 +49,10 @@ class ConvNet(nn.Module):
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
-        x = self.conv4(x)
 
-        x = F.avg_pool1d(x, 2)
         x = self.avgpool(x)
 
         x = torch.flatten(x, 1)
-        # x = self.fully_connected(x)
+        x = self.fully_connected(x)
 
         return x
