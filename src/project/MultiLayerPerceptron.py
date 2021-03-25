@@ -35,6 +35,7 @@ class MultiLayerPerceptron(nn.Module):
 
 
     def forward(self, x: torch.Tensor):
+        x = x.view(-1, self.n_in)
 
         x = self.dropout1(x)
         x = F.relu(self.fc1(x))
@@ -47,7 +48,5 @@ class MultiLayerPerceptron(nn.Module):
 
         x = self.dropout4(x)
         x = self.fc4(x)
-
-        x = x.view(-1, self.n_classes)
 
         return x
