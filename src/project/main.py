@@ -129,7 +129,7 @@ def main():
 
     # Parameters:
     parameters = {
-        "tags": [],
+        "tags": ['scheduler'],
         "seed_number": 42,
         "device": device,
         "run_mlp": True,
