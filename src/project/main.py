@@ -97,7 +97,7 @@ def run_train_models(datasets, parameters):
 def run_experiments(datasets, parameters):
 
     # Populate tags with some info.
-    tags = ["Local"]
+    tags = []
     if parameters['run_mlp']:
         tags.append("MLP")
     if parameters['run_fcn']:
