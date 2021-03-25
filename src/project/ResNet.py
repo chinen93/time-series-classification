@@ -15,20 +15,17 @@ class ResNet(nn.Module):
             self.blocks.append(ResidualBlock(*blocks[b:b+2], self.n_in))
 
         self.avgpool = nn.AdaptiveAvgPool1d(output_size=1)
-        self.maxpool = nn.AdaptiveMaxPool1d(output_size=1)
 
-        self.fc1 = nn.Linear(blocks[-1] * 2, self.n_classes)
+        self.fc1 = nn.Linear(blocks[-1], self.n_classes)
 
 
     def forward(self, x: torch.Tensor):
         for block in self.blocks:
             x = block(x)
 
-        mp = self.maxpool(x)
-        ap = self.avgpool(x)
-        x = torch.cat([mp, ap], 1)
-
+        x = self.avgpool(x)
         x = torch.flatten(x, 1)
+
         x = self.fc1(x)
 
         return x

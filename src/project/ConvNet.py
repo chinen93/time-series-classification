@@ -40,9 +40,8 @@ class ConvNet(nn.Module):
         self.bn3 = nn.BatchNorm1d(num_features=128)
 
         self.avgpool = nn.AdaptiveAvgPool1d(output_size=1)
-        self.maxpool = nn.AdaptiveMaxPool1d(output_size=1)
 
-        self.fully_connected = nn.Linear(128 * 2, self.n_classes)
+        self.fully_connected = nn.Linear(128, self.n_classes)
 
 
     def forward(self, x: torch.Tensor):
@@ -52,11 +51,9 @@ class ConvNet(nn.Module):
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
 
-        mp = self.maxpool(x)
-        ap = self.avgpool(x)
-        x = torch.cat([mp, ap], 1)
-
+        x = self.avgpool(x)
         x = torch.flatten(x, 1)
+
         x = self.fully_connected(x)
 
         return x
