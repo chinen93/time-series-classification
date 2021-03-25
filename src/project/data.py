@@ -71,9 +71,8 @@ class DataTSV(Dataset):
         self.inputs = train_data.iloc[:, 1:].values
         self.targets = train_data.iloc[:, 0].values
 
-
-        self.mean = np.mean(self.inputs, axis=0)
-        self.std = np.std(self.inputs, axis=0)
+        self.mean = self.inputs.mean()
+        self.std = self.inputs.std()
 
         if (self.std == 0).any():
             raise ValueError
