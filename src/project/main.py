@@ -97,7 +97,7 @@ def run_train_models(datasets, parameters):
 def run_experiments(datasets, parameters):
 
     # Populate tags with some info.
-    tags = []
+    tags = parameters['tags']
     if parameters['run_mlp']:
         tags.append("MLP")
     if parameters['run_fcn']:
@@ -129,6 +129,7 @@ def main():
 
     # Parameters:
     parameters = {
+        "tags": [],
         "seed_number": 42,
         "device": device,
         "run_mlp": True,
