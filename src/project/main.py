@@ -43,7 +43,7 @@ def run_train_models(datasets, parameters):
                                    device=device,
                                    model=model,
                                    optimizer=optimizer,
-                                   epochs=parameters["epochs"],
+                                   epochs=parameters["mlp_epochs"],
                                    save=False)
 
         # ConvNet
@@ -67,7 +67,7 @@ def run_train_models(datasets, parameters):
                                    device=device,
                                    model=model,
                                    optimizer=optimizer,
-                                   epochs=parameters["epochs"],
+                                   epochs=parameters["fcn_epochs"],
                                    save=False)
 
         # ResNet
@@ -90,14 +90,14 @@ def run_train_models(datasets, parameters):
                                    device=device,
                                    model=model,
                                    optimizer=optimizer,
-                                   epochs=parameters["epochs"],
+                                   epochs=parameters["fcn_epochs"],
                                    save=False)
 
 
 def run_experiments(datasets, parameters):
 
     # Populate tags with some info.
-    tags = []
+    tags = ["Local"]
     if parameters['run_mlp']:
         tags.append("MLP")
     if parameters['run_fcn']:
@@ -129,15 +129,16 @@ def main():
 
     # Parameters:
     parameters = {
-        "epochs": 2000,
         "seed_number": 42,
         "device": device,
         "run_mlp": True,
         "run_fcn": True,
         "run_resnet": True,
+        "mlp_epochs": 5000,
         "mlp_lr": 0.1,
         "mlp_rho": 0.95,
         "mlp_eps": 1e-8,
+        "fcn_epochs": 2000,
         "fcn_lr": 0.001,
         "fcn_betas": (0.9, 0.999),
         "fcn_eps": 1e-8
