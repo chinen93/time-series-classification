@@ -136,13 +136,13 @@ def main():
         "run_fcn": True,
         "run_resnet": True,
         "mlp_epochs": 5000,
-        "mlp_lr": 0.001,
+        "mlp_lr": 0.1,
         "mlp_rho": 0.95,
-        "mlp_eps": 1e-7,
+        "mlp_eps": 1e-8,
         "fcn_epochs": 2000,
         "fcn_lr": 0.001,
         "fcn_betas": (0.9, 0.999),
-        "fcn_eps": 1e-7
+        "fcn_eps": 1e-8
     }
 
     datasets = np.loadtxt('datasets.txt', dtype=str)
