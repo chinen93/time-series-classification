@@ -15,18 +15,22 @@ class ResNet(nn.Module):
             self.blocks.append(ResidualBlock(*blocks[b:b+2], self.n_in))
 
         self.avgpool = nn.AdaptiveAvgPool1d(output_size=1)
+        self.maxpool = nn.AdaptiveMaxPool1d(output_size=1)
 
-        self.fc1 = nn.Linear(blocks[-1], self.n_classes)
+        self.fully_connected = nn.Linear(blocks[-1] * 2, self.n_classes)
 
 
     def forward(self, x: torch.Tensor):
         for block in self.blocks:
             x = block(x)
 
-        x = self.avgpool(x)
+        avgpool = self.avgpool(x)
+        maxpool = self.maxpool(x)
+        x = torch.cat([avgpool, maxpool], 1)
+
         x = torch.flatten(x, 1)
 
-        x = self.fc1(x)
+        x = self.fully_connected(x)
 
         return x
 
@@ -67,20 +71,20 @@ class ResidualBlock(nn.Module):
         )
         self.bn3 = nn.BatchNorm1d(self.out_maps)
 
-        self.convI = nn.Conv1d(
+        self.conv_identity = nn.Conv1d(
             in_channels=self.in_maps,
             out_channels=self.out_maps,
             kernel_size=1
         )
-        self.bnI = nn.BatchNorm1d(self.out_maps)
+        self.bn_indentity = nn.BatchNorm1d(self.out_maps)
 
     def forward(self, x):
 
         is_expand_channels = not self.in_maps == self.out_maps
         if is_expand_channels:
-            identity = self.bnI(self.convI(x))
+            identity = self.bn_indentity(self.conv_identity(x))
         else:
-            identity = self.bnI(x)
+            identity = self.bn_indentity(x)
 
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))

@@ -11,7 +11,7 @@ class MultiLayerPerceptron(nn.Module):
 
         self.dropout1 = nn.Dropout(p=0.1)
         self.fc1 = nn.Linear(
-            in_features=n_in,
+            in_features=self.n_in,
             out_features=500
         )
 
@@ -28,7 +28,7 @@ class MultiLayerPerceptron(nn.Module):
         )
 
         self.dropout4 = nn.Dropout(p=0.3)
-        self.fc4 = nn.Linear(
+        self.fully_connected = nn.Linear(
             in_features=500,
             out_features=self.n_classes
         )
@@ -47,6 +47,6 @@ class MultiLayerPerceptron(nn.Module):
         x = F.relu(self.fc3(x))
 
         x = self.dropout4(x)
-        x = self.fc4(x)
+        x = self.fully_connected(x)
 
         return x
