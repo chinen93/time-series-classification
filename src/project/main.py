@@ -106,7 +106,7 @@ def run_experiments(datasets, parameters):
         tags.append("ResNet")
 
     # Create Neptune client.
-    neptune.init(project_qualified_name='pedro-chinen/time-series-classification')
+    neptune.init(project_qualified_name=parameters['neptune_project'])
     neptune.create_experiment(
         upload_source_files=[],
         params=parameters,
@@ -129,6 +129,7 @@ def main():
 
     # Parameters:
     parameters = {
+        "neptune_project": 'pedro-chinen/time-series-classification',
         "tags": ['scheduler'],
         "seed_number": 42,
         "device": device,
