@@ -6,6 +6,8 @@ import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from data import *
+import numpy
+import random
 
 def download_datasets(datasets):
     """
@@ -48,8 +50,22 @@ def data_dictionary(datasets):
         batch_size = min(16, len(train_set)//10)
 
         dataset_dict[dataset] = {}
-        dataset_dict[dataset]['train'] = DataLoader(train_set, batch_size=batch_size)
-        dataset_dict[dataset]['test'] = DataLoader(test_set, batch_size=batch_size)
+
+        def seed_worker(worker_id):
+            worker_seed = torch.initial_seed() % 2**32
+            numpy.random.seed(worker_seed)
+            random.seed(worker_seed)
+
+        dataset_dict[dataset]['train'] = DataLoader(
+            train_set,
+            batch_size=batch_size,
+            worker_init_fn=seed_worker
+        )
+        dataset_dict[dataset]['test'] = DataLoader(
+            test_set,
+            batch_size=batch_size,
+            worker_init_fn=seed_worker
+        )
 
     return dataset_dict
 
