@@ -14,7 +14,16 @@ from ResNet import *
 
 def run_train_models(datasets, parameters):
     device = parameters["device"]
-    for dataset, dataloader in datasets.items():
+
+    # Per-Class-Error
+    per_class_error = {
+        "MLP": 0.0,
+        "FCN": 0.0,
+        "ResNet": 0.0
+    }
+
+    for dataset_number, (dataset, dataloader) in enumerate(datasets.items()):
+        dataset_number += 1
 
         # setting up
         print_dataset_info(dataset, dataloader)
@@ -25,7 +34,8 @@ def run_train_models(datasets, parameters):
 
         # MLP
         if parameters["run_mlp"]:
-            print("MLP")
+            model_name = "MLP"
+            print(model_name)
             model = MultiLayerPerceptron(time_steps, n_classes)
             optimizer = optim.Adadelta(
                 model.parameters(),
@@ -36,19 +46,25 @@ def run_train_models(datasets, parameters):
             if torch.cuda.device_count() > 0:
                 model = nn.DataParallel(model)
             model.to(device)
-            model, history = train(model_name="MLP",
-                                   dataset_name=dataset,
-                                   dataloader_train=dataloader['train'],
-                                   dataloader_test=dataloader['test'],
-                                   device=device,
-                                   model=model,
-                                   optimizer=optimizer,
-                                   epochs=parameters["mlp_epochs"],
-                                   save=False)
+            test_error_rate, model, _ = train(
+                model_name=model_name,
+                dataset_name=dataset,
+                dataloader_train=dataloader['train'],
+                dataloader_test=dataloader['test'],
+                device=device,
+                model=model,
+                optimizer=optimizer,
+                epochs=parameters["mlp_epochs"],
+                save=False
+            )
+            per_class_error[model_name] += test_error_rate
+            mean_per_class_error = per_class_error[model_name] / dataset_number
+            neptune.log_metric("{}_mpce".format(model_name), mean_per_class_error)
 
         # ConvNet
         if parameters["run_fcn"]:
-            print("FCN")
+            model_name = "FCN"
+            print(model_name)
             model = ConvNet(time_steps, n_classes)
             if torch.cuda.device_count() > 0:
                 model = nn.DataParallel(model)
@@ -60,19 +76,25 @@ def run_train_models(datasets, parameters):
                 betas=parameters["fcn_betas"],
                 eps=parameters["fcn_eps"]
             )
-            model, history = train(model_name="FCN",
-                                   dataset_name=dataset,
-                                   dataloader_train=dataloader['train'],
-                                   dataloader_test=dataloader['test'],
-                                   device=device,
-                                   model=model,
-                                   optimizer=optimizer,
-                                   epochs=parameters["fcn_epochs"],
-                                   save=False)
+            test_error_rate, model, _ = train(
+                model_name=model_name,
+                dataset_name=dataset,
+                dataloader_train=dataloader['train'],
+                dataloader_test=dataloader['test'],
+                device=device,
+                model=model,
+                optimizer=optimizer,
+                epochs=parameters["fcn_epochs"],
+                save=False
+            )
+            per_class_error[model_name] += test_error_rate
+            mean_per_class_error = per_class_error[model_name] / dataset_number
+            neptune.log_metric("{}_mpce".format(model_name), mean_per_class_error)
 
         # ResNet
         if parameters["run_resnet"]:
-            print("ResNet")
+            model_name = "ResNet"
+            print(model_name)
             model = ResNet(time_steps, n_classes)
             if torch.cuda.device_count() > 0:
                 model = nn.DataParallel(model)
@@ -83,15 +105,20 @@ def run_train_models(datasets, parameters):
                 betas=parameters["fcn_betas"],
                 eps=parameters["fcn_eps"]
             )
-            model, history = train(model_name="ResNet",
-                                   dataset_name=dataset,
-                                   dataloader_train=dataloader['train'],
-                                   dataloader_test=dataloader['test'],
-                                   device=device,
-                                   model=model,
-                                   optimizer=optimizer,
-                                   epochs=parameters["fcn_epochs"],
-                                   save=False)
+            test_error_rate, model, _ = train(
+                model_name=model_name,
+                dataset_name=dataset,
+                dataloader_train=dataloader['train'],
+                dataloader_test=dataloader['test'],
+                device=device,
+                model=model,
+                optimizer=optimizer,
+                epochs=parameters["fcn_epochs"],
+                save=False
+            )
+            per_class_error[model_name] += test_error_rate
+            mean_per_class_error = per_class_error[model_name] / dataset_number
+            neptune.log_metric("{}_mpce".format(model_name), mean_per_class_error)
 
 
 def run_experiments(datasets, parameters):

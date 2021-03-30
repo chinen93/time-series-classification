@@ -126,4 +126,4 @@ def train(model_name: str,
             #save
             pass
 
-    return model, history
+    return test_error_rate, model, history
