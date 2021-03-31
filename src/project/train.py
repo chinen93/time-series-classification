@@ -50,6 +50,7 @@ def train(model_name: str,
         bar_format=bar_format,
         postfix=postfix
     )
+    best_error_rate = 1
     best_loss = 999
 
     for epoch in range(epochs):
@@ -119,6 +120,7 @@ def train(model_name: str,
         neptune.log_metric('{}_test_time'.format(desc), elapsed_time)
         if test_loss <= best_loss:
             best_loss = test_loss
+            best_error_rate = test_error_rate
             neptune.log_metric('{}_test_best_loss'.format(desc), x=epoch, y=test_loss)
             neptune.log_metric('{}_test_best_error_rate'.format(desc), x=epoch, y=test_error_rate)
 
@@ -126,4 +128,4 @@ def train(model_name: str,
             #save
             pass
 
-    return test_error_rate, model, history
+    return best_error_rate, model, history
