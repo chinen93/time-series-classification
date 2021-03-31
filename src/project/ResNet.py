@@ -88,7 +88,8 @@ class ResidualBlock(nn.Module):
 
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
-        x = F.relu(self.bn3(self.conv3(x)))
+
+        x = self.bn3(self.conv3(x))
 
         # Clip timesteps to the smaller one.
         shape = identity.shape[2]
@@ -100,5 +101,7 @@ class ResidualBlock(nn.Module):
 
         # Add residual part.
         x += identity
+
+        x = F.relu(x)
 
         return x
