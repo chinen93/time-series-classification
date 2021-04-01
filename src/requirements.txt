@@ -11,6 +11,7 @@ idna==2.10
 jsonpointer==2.0
 jsonref==0.2
 jsonschema==3.2.0
+mock==4.0.3
 monotonic==1.5
 msgpack==1.0.2
 neptune-client==0.4.133
