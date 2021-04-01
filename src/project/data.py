@@ -13,7 +13,7 @@ class Data(Dataset):
         train_data = pd.DataFrame(
             loadarff('data/{}_TRAIN.arff'.format(dataset))[0])
         dtypes = {i:np.float32 for i in train_data.columns[:-1]}
-        dtypes.update({train_data.columns[-1]: np.int})
+        dtypes.update({train_data.columns[-1]: int})
         train_data = train_data.astype(dtypes)
 
         self.inputs = train_data.iloc[:, :-1].values
@@ -26,7 +26,7 @@ class Data(Dataset):
             test_data = pd.DataFrame(
                 loadarff('data/{}_TEST.arff'.format(dataset))[0])
             dtypes = {i:np.float32 for i in test_data.columns[:-1]}
-            dtypes.update({test_data.columns[-1]: np.int})
+            dtypes.update({test_data.columns[-1]: int})
             test_data = test_data.astype(dtypes)
 
             self.inputs = test_data.iloc[:, :-1].values
@@ -62,7 +62,7 @@ class DataTSV(Dataset):
             header=None
         )
         dtypes = {i:np.float32 for i in train_data.columns[:-1]}
-        dtypes.update({train_data.columns[-1]: np.int})
+        dtypes.update({train_data.columns[-1]: int})
         train_data = train_data.astype(dtypes)
 
         if not np.isfinite(train_data).all().all():
@@ -84,7 +84,7 @@ class DataTSV(Dataset):
                 header=None
             )
             dtypes = {i:np.float32 for i in test_data.columns[:-1]}
-            dtypes.update({test_data.columns[-1]: np.int})
+            dtypes.update({test_data.columns[-1]: int})
             test_data = test_data.astype(dtypes)
 
             if not np.isfinite(test_data).all().all():

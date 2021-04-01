@@ -26,7 +26,8 @@ def run_train_models(datasets, parameters):
         dataset_number += 1
 
         # setting up
-        print_dataset_info(dataset, dataloader)
+        if parameters["verbose"]:
+            print_dataset_info(dataset, dataloader)
         sleep(1)
 
         time_steps = dataloader['test'].dataset.inputs.shape[-1]
@@ -35,7 +36,8 @@ def run_train_models(datasets, parameters):
         # MLP
         if parameters["run_mlp"]:
             model_name = "MLP"
-            print(model_name)
+            if parameters["verbose"]:
+                print(model_name)
             model = MultiLayerPerceptron(time_steps, n_classes)
             optimizer = optim.Adadelta(
                 model.parameters(),
@@ -57,14 +59,15 @@ def run_train_models(datasets, parameters):
                 epochs=parameters["mlp_epochs"],
                 save=False
             )
-            per_class_error[model_name] += test_error_rate
+            per_class_error[model_name] += test_error_rate / n_classes
             mean_per_class_error = per_class_error[model_name] / dataset_number
             neptune.log_metric("{}_mpce".format(model_name), mean_per_class_error)
 
         # ConvNet
         if parameters["run_fcn"]:
             model_name = "FCN"
-            print(model_name)
+            if parameters["verbose"]:
+                print(model_name)
             model = ConvNet(time_steps, n_classes)
             if torch.cuda.device_count() > 0:
                 model = nn.DataParallel(model)
@@ -87,14 +90,15 @@ def run_train_models(datasets, parameters):
                 epochs=parameters["fcn_epochs"],
                 save=False
             )
-            per_class_error[model_name] += test_error_rate
+            per_class_error[model_name] += test_error_rate / n_classes
             mean_per_class_error = per_class_error[model_name] / dataset_number
             neptune.log_metric("{}_mpce".format(model_name), mean_per_class_error)
 
         # ResNet
         if parameters["run_resnet"]:
             model_name = "ResNet"
-            print(model_name)
+            if parameters["verbose"]:
+                print(model_name)
             model = ResNet(time_steps, n_classes)
             if torch.cuda.device_count() > 0:
                 model = nn.DataParallel(model)
@@ -116,7 +120,7 @@ def run_train_models(datasets, parameters):
                 epochs=parameters["fcn_epochs"],
                 save=False
             )
-            per_class_error[model_name] += test_error_rate
+            per_class_error[model_name] += test_error_rate / n_classes
             mean_per_class_error = per_class_error[model_name] / dataset_number
             neptune.log_metric("{}_mpce".format(model_name), mean_per_class_error)
 
@@ -147,8 +151,8 @@ def run_experiments(datasets, parameters):
         run_train_models(datasets, parameters)
     except KeyboardInterrupt:
         pass
-
-    neptune.stop()
+    finally:
+        neptune.stop()
 
 def main():
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -156,6 +160,7 @@ def main():
 
     # Parameters:
     parameters = {
+        "verbose": True,
         "neptune_project": 'pedro-chinen/time-series-classification',
         "tags": ['scheduler'],
         "seed_number": 42,
@@ -194,5 +199,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-else:
-    raise "This script should be called as a single program"
